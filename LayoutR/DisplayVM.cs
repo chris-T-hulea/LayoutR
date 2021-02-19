@@ -1,4 +1,5 @@
 ﻿using DataModel.Entities;
+using DataModel.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,16 +12,18 @@ namespace LayoutR
 {
 	public class DisplayVM : ViewModel
 	{
+		private readonly MainWindowViewModel parent;
 		private readonly Display display;
 		private readonly double factor = 0.1;
 		private double height;
 		private double width;
 		private Thickness offset;
-		private int hDivisions = 2;
-		private int vDivisions = 1;
+		private int hDivisions = 1;
+		private int vDivisions = 2;
 
-		public DisplayVM(Display display)
+		public DisplayVM(MainWindowViewModel parent, Display display)
 		{
+			this.parent = parent;
 			this.display = display;
 
 			this.height = display.Height;
@@ -70,7 +73,7 @@ namespace LayoutR
 					{
 						zoneOffsetX = (j * zoneWidth);
 						zoneOffsetY = (i * zoneHeight);
-						this.Zones.Add(new ZoneVM(zoneHeight, zoneWidth, zoneOffsetX, zoneOffsetY));
+						this.Zones.Add(new ZoneVM(this.parent, zoneHeight, zoneWidth, zoneOffsetX, zoneOffsetY));
 					}
 				}
 
@@ -79,6 +82,15 @@ namespace LayoutR
 		}
 
 		public Thickness Offset { get => this.offset; set => this.SetProperty(ref this.offset, value); }
+		public Rectangle Rectangle 
+		{ 
+			get => new Rectangle
+		{
+				Top = (int)Math.Round(Offset.Top/factor),
+				Left = (int)Math.Round(Offset.Left/factor),
+
+		};
+		}
 		public BulkObservableCollection<ZoneVM> Zones { get; private set; }
 	}
 }

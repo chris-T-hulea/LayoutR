@@ -18,6 +18,7 @@ namespace LayoutR
 		private int right;
 		private int bot;
 		private int height;
+		private ZoneVM zoneVM;
 		private readonly DispatcherTimer timer;
 
 		public MainWindowViewModel(IWindowConrtoller windowController, IDisplayService displayService)
@@ -28,7 +29,7 @@ namespace LayoutR
 			this.SetupTimer();
 
 			this.Screens = new BulkObservableCollection<Screen>();
-			this.Displays = new BulkObservableCollection<DisplayVM>(this.displayService.GetAllDisplays().Select(display => new DisplayVM(display)));
+			this.Displays = new BulkObservableCollection<DisplayVM>(this.displayService.GetAllDisplays().Select(display => new DisplayVM(this, display)));
 			this.SelectedDisplay = this.Displays[1];
 			OnTimerElapsed(null, null);
 		}
@@ -45,6 +46,14 @@ namespace LayoutR
 				this.SetBounds();
 			}
 		}
+		public ZoneVM SelectedZone
+		{
+			get => this.zoneVM;
+			set
+			{
+				this.SetProperty(ref this.zoneVM, value);
+			}
+		}
 		public DisplayVM SelectedDisplay
 		{
 			get => this.display;
@@ -52,6 +61,13 @@ namespace LayoutR
 			{
 				this.SetProperty(ref this.display, value);
 			}
+		}
+
+		public void SelectZone(ZoneVM zone)
+		{
+			this.SelectedZone = zone;
+			this.SelectedZone.Screen = this.SelectedScreen;
+			this.windowController.SetScreenBounds(screen, zone.Rectangle, Displays[1].Rectangle.Left, Displays[1].Rectangle.Top);
 		}
 
 		private void SetBounds()

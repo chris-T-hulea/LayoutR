@@ -1,5 +1,6 @@
 ﻿using DataModel.Entities;
 using DataModel.Geometry;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -16,7 +17,11 @@ namespace WindowController
 
 		[DllImport("user32.dll")]
 		[return: MarshalAs(UnmanagedType.Bool)]
-		static extern bool GetWindowRect(HandleRef hWnd, out Rectangle lpRect);
+		private static extern bool GetWindowRect(HandleRef hWnd, out Rectangle lpRect);
+
+		[DllImport("user32.dll", SetLastError = true)]
+		private static extern bool MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
+
 
 		public IEnumerable<Screen> GetAllProcesses()
 		{
@@ -35,6 +40,11 @@ namespace WindowController
 			GetWindowRect(new HandleRef(screen, screen.Pointer), out Rectangle lpRect);
 
 			return (lpRect.Left, lpRect.Top, lpRect.Right, lpRect.Bottom);
+		}
+
+		public void SetScreenBounds(Screen screen, Rectangle lpRect)
+		{
+			MoveWindow(screen.Pointer, lpRect.Left, lpRect.Top, lpRect.Right - lpRect.Left, lpRect.Bottom - lpRect.Top, true);
 		}
 	}
 }
