@@ -9,6 +9,15 @@ namespace WindowController
 {
 	class DisplayService : IDisplayService
 	{
+		private List<Display> displays;
+
+		private readonly Rect taskbarDiff = new Rect { Bottom = 40 };
+
+		public DisplayService()
+		{
+			this.displays = new List<Display>();
+		}
+
 		/// <summary>
 		/// Gets the rectangle representing the frame of a window.
 		/// </summary>
@@ -16,31 +25,37 @@ namespace WindowController
 		/// <param name="rectangle">The rectangle.</param>
 		/// <returns></returns>
 		[DllImport("user32.dll")]
-		public static extern bool GetWindowRect(IntPtr windowHandle, ref Rectangle rectangle);
+		static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, EnumMonitorsDelegate lpfnEnum, IntPtr dwData);
+
+		delegate bool EnumMonitorsDelegate(IntPtr hMonitor, IntPtr hdcMonitor, ref Rect lprcMonitor, IntPtr dwData);
+
+
+		private bool func(IntPtr hMonitor, IntPtr hdcMonitor, ref Rect lprcMonitor, IntPtr dwData)
+		{
+			Display display;
+			Display di = new Display();
+
+			di.Position = new Rect
+			{
+				Left = lprcMonitor.Left,
+				Top = lprcMonitor.Top,
+				Right = lprcMonitor.Right,
+				Bottom = lprcMonitor.Bottom - taskbarDiff.Bottom,
+
+			};
+
+			di.IsPrimary = di.Position.Left == 0 && di.Position.Top == 0;
+			this.displays.Add(di);
+			return true;
+		}
 
 		public IEnumerable<Display> GetAllDisplays()
 		{
-			return new List<Display>()
-			{
-				new Display
-				{
-					Id = 0,
-					Width = 2560,
-					Height = 1440,
-					OffsetY = 0,
-					OffsetX = 0,
-					IsPrimary = true,
-				},
-				new Display
-				{
-					Id = 0,
-					Width = 1440,
-					Height = 2560,
-					OffsetX = -1440,
-					OffsetY = -827,
-					IsPrimary = true,
-				}
-			};
+			Rect al = new Rect();
+
+			EnumDisplayMonitors((IntPtr)null, (IntPtr)null, func, (IntPtr)null);
+
+			return displays;
 		}
 	}
 }
