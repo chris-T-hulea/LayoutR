@@ -22,7 +22,7 @@ namespace LayoutR
 			return true;
 		}
 
-		private void RaisePropertyChanged(string propertyname)
+		protected void RaisePropertyChanged(string propertyname)
 		{
 			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyname));
 		}

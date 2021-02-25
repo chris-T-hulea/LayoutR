@@ -8,6 +8,6 @@ namespace WindowController.Interfaces
 	{
 		IEnumerable<Screen> GetAllWindows();
 		(int left, int top, int right, int bot) GetScreenBounds(Screen screen);
-		void SetScreenBounds(Screen screen, Rectangle lpRect, int offsetX, int offsetY);
+		void SetScreenBounds(Screen screen, Rect lpRect, int offsetX, int offsetY);
 	}
 }

@@ -26,9 +26,9 @@ namespace WindowController
 			return this.processService.GetScreenBounds(screen);
 		}
 
-		public void SetScreenBounds(Screen screen, Rectangle lpRect, int offsetX, int offsetY)
+		public void SetScreenBounds(Screen screen, Rect lpRect, int offsetX, int offsetY)
 		{
-			lpRect = new Rectangle
+			lpRect = new Rect
 			{
 				Left = lpRect.Left + offsetX,
 				Top = lpRect.Top + offsetY,
