@@ -1,31 +1,53 @@
 ﻿using DataModel.Entities;
 using DataModel.Geometry;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using WindowController.Interfaces;
 
 namespace WindowController
 {
+	/// <summary>
+	/// Thw window controller class.
+	/// </summary>
 	class WindowController : IWindowConrtoller
 	{
+
+		#region Private Fields
+
 		private readonly IProcessService processService;
 
+		#endregion
+
+		#region Constructor
+
+		/// <summary>
+		/// Initializes a new instance of class <see cref="WindowController"/>
+		/// </summary>
+		/// <param name="processService">The process service.</param>
 		public WindowController(IProcessService processService)
 		{
 			this.processService = processService;
 		}
 
+		#endregion
+
+		#region Public Methods
+
+		/// <inheritdoc/>
 		public IEnumerable<Screen> GetAllWindows()
 		{
 			var screens = this.processService.GetAllProcesses();
-			return screens.Where(screen => screen.Title?.Length > 0);
+			return screens.Where(s => s.Pointer != IntPtr.Zero);
 		}
 
-		public (int left, int top, int right, int bot) GetScreenBounds(Screen screen)
+		/// <inheritdoc/>
+		public Rect GetScreenBounds(Screen screen)
 		{
 			return this.processService.GetScreenBounds(screen);
 		}
 
+		/// <inheritdoc/>
 		public void SetScreenBounds(Screen screen, Rect lpRect, int offsetX, int offsetY)
 		{
 			lpRect = new Rect
@@ -37,5 +59,8 @@ namespace WindowController
 			};
 			this.processService.SetScreenBounds(screen, lpRect);
 		}
+
+		#endregion
+
 	}
 }

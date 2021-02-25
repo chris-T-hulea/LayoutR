@@ -7,16 +7,37 @@ using WindowController.Interfaces;
 
 namespace WindowController
 {
+	/// <summary>
+	/// Service for managing the Displays
+	/// </summary>
 	class DisplayService : IDisplayService
 	{
-		private List<Display> displays;
 
+		#region Private Fields
+		
+		/// <summary>
+		/// Task bar size 
+		/// </summary>
+		// TODO find it dynamically
 		private readonly Rect taskbarDiff = new Rect { Bottom = 40 };
 
+		private List<Display> displays;
+
+		#endregion
+
+		#region Constructors
+
+		/// <summary>
+		/// Initializes a new instance of <see cref="DisplayService"/>.
+		/// </summary>
 		public DisplayService()
 		{
 			this.displays = new List<Display>();
 		}
+
+		#endregion
+
+		#region External Methods
 
 		/// <summary>
 		/// Gets the rectangle representing the frame of a window.
@@ -27,15 +48,28 @@ namespace WindowController
 		[DllImport("user32.dll")]
 		static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, EnumMonitorsDelegate lpfnEnum, IntPtr dwData);
 
+		#endregion
+
 		delegate bool EnumMonitorsDelegate(IntPtr hMonitor, IntPtr hdcMonitor, ref Rect lprcMonitor, IntPtr dwData);
 
-
-		private bool func(IntPtr hMonitor, IntPtr hdcMonitor, ref Rect lprcMonitor, IntPtr dwData)
+		#region Public Methods
+		public IEnumerable<Display> GetAllDisplays()
 		{
-			Display display;
-			Display di = new Display();
+			this.displays.Clear();
 
-			di.Position = new Rect
+			EnumDisplayMonitors((IntPtr)null, (IntPtr)null, AddMonitor, (IntPtr)null);
+
+			return displays;
+		}
+
+		#endregion
+
+		#region Private Methods
+		private bool AddMonitor(IntPtr hMonitor, IntPtr hdcMonitor, ref Rect lprcMonitor, IntPtr dwData)
+		{
+			Display display = new Display();
+
+			display.Position = new Rect
 			{
 				Left = lprcMonitor.Left,
 				Top = lprcMonitor.Top,
@@ -44,18 +78,14 @@ namespace WindowController
 
 			};
 
-			di.IsPrimary = di.Position.Left == 0 && di.Position.Top == 0;
-			this.displays.Add(di);
+			display.IsPrimary = display.Position.Left == 0 && display.Position.Top == 0;
+
+			this.displays.Add(display);
+
 			return true;
 		}
 
-		public IEnumerable<Display> GetAllDisplays()
-		{
-			Rect al = new Rect();
+		#endregion
 
-			EnumDisplayMonitors((IntPtr)null, (IntPtr)null, func, (IntPtr)null);
-
-			return displays;
-		}
 	}
 }
