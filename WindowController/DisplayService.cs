@@ -53,6 +53,8 @@ namespace WindowController
 		delegate bool EnumMonitorsDelegate(IntPtr hMonitor, IntPtr hdcMonitor, ref Rect lprcMonitor, IntPtr dwData);
 
 		#region Public Methods
+
+		/// <inheritdoc/>
 		public IEnumerable<Display> GetAllDisplays()
 		{
 			this.displays.Clear();
@@ -65,6 +67,7 @@ namespace WindowController
 		#endregion
 
 		#region Private Methods
+
 		private bool AddMonitor(IntPtr hMonitor, IntPtr hdcMonitor, ref Rect lprcMonitor, IntPtr dwData)
 		{
 			Display display = new Display();

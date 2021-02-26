@@ -4,20 +4,21 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Thickness = System.Windows.Thickness;
-
 namespace LayoutR
 {
+	/// <summary>
+	/// View model class for display.
+	/// </summary>
 	public class DisplayVM : ViewModel
 	{
+
+		#region Private Fields
+
+		private const int headerHeight = 10;
 		private readonly MainWindowViewModel mainWindow;
 		private readonly Display display;
 		private readonly double factor = 0.1;
 		private readonly int index;
-		private const int headerHeight = 10;
-		private double height;
-		private double width;
-		private Thickness offset;
 
 
 		private int hDivisions = 1;
@@ -31,6 +32,16 @@ namespace LayoutR
 		private RectangleVM rectangleVm;
 		private double defaultHeight;
 
+		#endregion
+
+		#region Constructors
+
+		/// <summary>
+		/// Initializes a new instance of class <see cref="DisplayVM"/>
+		/// </summary>
+		/// <param name="mainWindow">The main window view model.</param>
+		/// <param name="display">The display entity.</param>
+		/// <param name="index">The display horizontal index.</param>
 		public DisplayVM(MainWindowViewModel mainWindow, Display display, int index)
 		{
 			this.mainWindow = mainWindow;
@@ -48,41 +59,91 @@ namespace LayoutR
 				},
 				this.factor);
 
-			this.height = RectangleVm.ConfiguredRectangle.Height;
-			this.width = RectangleVm.ConfiguredRectangle.Width;
-
 			this.PopulateZones();
 
 			this.UpdateZones();
 		}
 
+		#endregion
+
+		#region Properties
+
+		/// <summary>
+		/// Gets or sets the display default height.
+		/// </summary>
 		public double DefaultHeight { get => this.defaultHeight; set => SetProperty(ref this.defaultHeight, value); }
+
+		/// <summary>
+		/// Gets or sets the display pozitional and size view model.
+		/// </summary>
 		public RectangleVM RectangleVm { get => this.rectangleVm; set => SetProperty(ref this.rectangleVm, value); }
+
+		/// <summary>
+		/// Gets or sets the zone belonging to the display.
+		/// </summary>
 		public ZoneVM[,] Zones { get => this.zones; set => SetProperty(ref this.zones, value); }
+
+		/// <summary>
+		/// Gets or sets the currently selected zone.
+		/// </summary>
 		public ZoneVM SelectedZone { get => this.selectedZone; set => SetProperty(ref this.selectedZone, value); }
+
+		/// <summary>
+		/// Gets or sets the name of the display (temporary)
+		/// </summary>
+		public string Name { get => this.display.IsPrimary ? "Primary" : "Secondary"; }
+
+		/// <summary>
+		/// Gets or sets the row headers.
+		/// </summary>
 		public int[] Rows { get => this.rows; set => SetProperty(ref this.rows, value); }
+
+		/// <summary>
+		/// Gets or sets the column headers.
+		/// </summary>
 		public int[] Columns { get => this.columns; set => SetProperty(ref this.columns, value); }
+
+		/// <summary>
+		/// Gets or sets the row heights of each row.
+		/// </summary>
 		public double[] RowSizes { get => this.rowSizes; set => SetProperty(ref this.rowSizes, value); }
+
+		/// <summary>
+		/// Gets or sets the column widths of each column.
+		/// </summary>
 		public double[] ColumnSizes { get => this.columnSizes; set => SetProperty(ref this.columnSizes, value); }
 
-
+		/// <summary>
+		/// Gets or sets the number of divisions on the horizontal axis.
+		/// </summary>
 		public int HDivisions
 		{
 			get => hDivisions;
 			set
 			{
 				SetProperty(ref this.hDivisions, value);
+				this.PopulateZones();
+				this.UpdateZones();
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets the number of division on the vertical axis.
+		/// </summary>
 		public int VDivisions
 		{
 			get => vDivisions;
 			set
 			{
 				SetProperty(ref this.vDivisions, value);
+				this.PopulateZones();
+				this.UpdateZones();
 			}
 		}
+
+		#endregion
+
+		#region PublicMethods
 
 		public void ResizeZones(double[] rows, double[] columns)
 		{
@@ -169,8 +230,11 @@ namespace LayoutR
 
 				return null;
 		}
+		#endregion
 
-		public static double Sum(IEnumerable<double> collection)
+		#region Private Methods
+
+		private static double Sum(IEnumerable<double> collection)
 		{
 			double sum = 0;
 			foreach (var val in collection)
@@ -217,5 +281,8 @@ namespace LayoutR
 			this.Columns = tempColumns;
 			this.ColumnSizes = tempColumnSizes;
 		}
+
+		#endregion
+
 	}
 }
