@@ -7,7 +7,7 @@ using RectD = DataModel.Geometry.RectD;
 namespace LayoutR
 {
 	/// <summary>
-	/// View model class reprezenting an area on the screen and one on the display.
+	/// View model class reprezenting an area on the Application and one on the display.
 	/// </summary>
 	public class RectangleVM : ViewModel
 	{

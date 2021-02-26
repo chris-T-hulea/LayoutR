@@ -35,20 +35,20 @@ namespace WindowController
 		#region Public Methods
 
 		/// <inheritdoc/>
-		public IEnumerable<Screen> GetAllWindows()
+		public IEnumerable<App> GetAllApplication()
 		{
-			var screens = this.processService.GetAllProcesses();
-			return screens.Where(s => s.Pointer != IntPtr.Zero);
+			var applications = this.processService.GetAllApplication();
+			return applications.Where(s => s.Pointer != IntPtr.Zero);
 		}
 
 		/// <inheritdoc/>
-		public Rect GetScreenBounds(Screen screen)
+		public Rect GetApplicationBounds(App application)
 		{
-			return this.processService.GetScreenBounds(screen);
+			return this.processService.GetApplicationBounds(application);
 		}
 
 		/// <inheritdoc/>
-		public void SetScreenBounds(Screen screen, Rect lpRect, int offsetX, int offsetY)
+		public void SetApplicationBounds(App application, Rect lpRect, int offsetX, int offsetY)
 		{
 			lpRect = new Rect
 			{
@@ -57,7 +57,7 @@ namespace WindowController
 				Right = lpRect.Right + offsetX,
 				Bottom = lpRect.Bottom + offsetY,
 			};
-			this.processService.SetScreenBounds(screen, lpRect);
+			this.processService.SetApplicationBounds(application, lpRect);
 		}
 
 		#endregion

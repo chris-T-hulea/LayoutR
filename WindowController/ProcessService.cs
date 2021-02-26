@@ -8,6 +8,9 @@ using System.Runtime.InteropServices;
 
 namespace WindowController
 {
+	/// <summary>
+	/// Service class for managing processes
+	/// </summary>
 	public class ProcessService : Interfaces.IProcessService
 	{
 
@@ -25,10 +28,10 @@ namespace WindowController
 
 
 		/// <inheritdoc/>
-		public IEnumerable<Screen> GetAllProcesses()
+		public IEnumerable<App> GetAllApplication()
 		{
 			IEnumerable<Process> processes = Process.GetProcesses();
-			return processes.Select(process => new Screen
+			return processes.Select(process => new App
 			{
 				Id = process.Id,
 				Name = process.ProcessName,
@@ -38,28 +41,28 @@ namespace WindowController
 		}
 
 		/// <inheritdoc/>
-		public Rect GetScreenBounds(Screen screen)
+		public Rect GetApplicationBounds(App application)
 		{
-			GetWindowRect(new HandleRef(screen, screen.Pointer), out Rect resultedRect);
+			GetWindowRect(new HandleRef(application, application.Pointer), out Rect resultedRect);
 
 			return resultedRect;
 		}
 
 		/// <inheritdoc/>
-		public void SetScreenBounds(Screen screen, Rect boundries)
+		public void SetApplicationBounds(App application, Rect boundries)
 		{
 			var adjustment = new Rect();
-			if (knownAdjustments.ContainsKey(screen.Name))
+			if (knownAdjustments.ContainsKey(application.Name))
 			{
-				adjustment = knownAdjustments[screen.Name];
+				adjustment = knownAdjustments[application.Name];
 			}
 			boundries += adjustment;
 
-			ShowWindow(screen.Pointer, ShowWindowEnum.ShowNormal);
+			ShowWindow(application.Pointer, ShowWindowEnum.ShowNormal);
 
-			//SetForegroundWindow(screen.Pointer);
+			//SetForegroundWindow(application.Pointer);
 
-			MoveWindow(screen.Pointer, boundries.Left, boundries.Top, boundries.Width, boundries.Height, true);
+			MoveWindow(application.Pointer, boundries.Left, boundries.Top, boundries.Width, boundries.Height, true);
 		}
 
 		#endregion

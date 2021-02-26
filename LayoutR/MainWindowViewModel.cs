@@ -1,5 +1,4 @@
-﻿using DataModel.Entities;
-using Prism.Commands;
+﻿using Prism.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +15,7 @@ namespace LayoutR
 
 		private readonly IWindowConrtoller windowController;
 		private readonly IDisplayService displayService;
-		private Screen screen;
+		private DataModel.Entities.App selectedApplication;
 		private DisplayVM display;
 		private ZoneVM zoneVM;
 		private readonly DispatcherTimer timer;
@@ -32,7 +31,7 @@ namespace LayoutR
 			this.timer = new DispatcherTimer();
 			this.SetupTimer();
 
-			this.Screens = new BulkObservableCollection<Screen>();
+			this.Applications = new BulkObservableCollection<DataModel.Entities.App>();
 			this.Displays = new BulkObservableCollection<DisplayVM>();
 
 			this.ReloadDisplays();
@@ -47,9 +46,9 @@ namespace LayoutR
 		#region Properties
 
 		/// <summary>
-		/// The list of available screens.
+		/// The list of available applications.
 		/// </summary>
-		public BulkObservableCollection<Screen> Screens { get; private set; }
+		public BulkObservableCollection<DataModel.Entities.App> Applications { get; private set; }
 
 		/// <summary>
 		/// The list of available displays.
@@ -57,15 +56,14 @@ namespace LayoutR
 		public BulkObservableCollection<DisplayVM> Displays { get; private set; }
 
 		/// <summary>
-		/// The currently selected screen.
+		/// The currently selected application.
 		/// </summary>
-		public Screen SelectedScreen
+		public DataModel.Entities.App SelectedApplication
 		{
-			get => this.screen;
+			get => this.selectedApplication;
 			set
 			{
-				this.SetProperty(ref this.screen, value);
-				this.SetBounds();
+				this.SetProperty(ref this.selectedApplication, value);
 			}
 		}
 
@@ -102,28 +100,20 @@ namespace LayoutR
 		#region Public Methods
 
 		/// <summary>
-		/// Selcts the zone and inserst the screen in it.
+		/// Selcts the zone and inserst the application in it.
 		/// </summary>
 		/// <param name="zone"></param>
 		public void SelectZone(ZoneVM zone)
 		{
 			this.SelectedZone = zone;
-			this.SelectedZone.Screen = this.SelectedScreen;
+			this.SelectedZone.Application = this.SelectedApplication;
 			var display = Displays.First(dis => dis.ContainesZone(zone) != null);
-			this.windowController.SetScreenBounds(screen, zone.Rectangle.ActualRectangle, display.RectangleVm.ActualRectangle.Left, display.RectangleVm.ActualRectangle.Top);
+			this.windowController.SetApplicationBounds(selectedApplication, zone.Rectangle.ActualRectangle, display.RectangleVm.ActualRectangle.Left, display.RectangleVm.ActualRectangle.Top);
 		}
 
 		#endregion
 
 		#region Private Methods
-
-		private void SetBounds()
-		{
-			if (this.SelectedScreen != null)
-			{
-				//(this.Left, this.Top, this.Right, this.Bot) = this.windowController.GetScreenBounds(SelectedScreen);
-			}
-		}
 
 		private void SetupTimer()
 		{
@@ -135,11 +125,11 @@ namespace LayoutR
 
 		private void OnTimerElapsed(object sender, EventArgs e)
 		{
-			using (this.Screens.SuppressiNotifications())
+			using (this.Applications.SuppressiNotifications())
 			{
-				IEnumerable<Screen> source = this.windowController.GetAllWindows().OrderBy(screen => screen.Name);
-				this.Screens.Clear();
-				this.Screens.AddRange(source);
+				IEnumerable<DataModel.Entities.App> source = this.windowController.GetAllApplication().OrderBy(app => app.Name);
+				this.Applications.Clear();
+				this.Applications.AddRange(source);
 			}
 		}
 
@@ -177,24 +167,24 @@ namespace LayoutR
 			var r = zoneVM.Row;
 			var c = zoneVM.Col;
 			var rect = displayVM.GetZone(r, c);
-			if (this.SelectedScreen == null)
+			if (this.SelectedApplication == null)
 			{
-				if (zoneVM.Screen != null)
+				if (zoneVM.Application != null)
 				{
-					this.windowController.SetScreenBounds(zoneVM.Screen, rect, zoneVM.DisplayVM.RectangleVm.ActualRectangle.Left, zoneVM.DisplayVM.RectangleVm.ActualRectangle.Top);
+					this.windowController.SetApplicationBounds(zoneVM.Application, rect, zoneVM.DisplayVM.RectangleVm.ActualRectangle.Left, zoneVM.DisplayVM.RectangleVm.ActualRectangle.Top);
 				}
 				return;
 			}
-			zoneVM.Screen = this.SelectedScreen;
-			this.SelectedScreen = null;
-			this.windowController.SetScreenBounds(zoneVM.Screen, rect, zoneVM.DisplayVM.RectangleVm.ActualRectangle.Left, zoneVM.DisplayVM.RectangleVm.ActualRectangle.Top);
+			zoneVM.Application = this.SelectedApplication;
+			this.SelectedApplication = null;
+			this.windowController.SetApplicationBounds(zoneVM.Application, rect, zoneVM.DisplayVM.RectangleVm.ActualRectangle.Left, zoneVM.DisplayVM.RectangleVm.ActualRectangle.Top);
 
 			ZoneVM found = null;
-			this.Displays.ToList().ForEach(dis => found = found ?? dis.ZoneList.FirstOrDefault(zone => zone.Screen == zoneVM.Screen && zone != zoneVM));
+			this.Displays.ToList().ForEach(dis => found = found ?? dis.ZoneList.FirstOrDefault(zone => zone.Application == zoneVM.Application && zone != zoneVM));
 
 			if (found != null)
 			{
-				found.Screen = null;
+				found.Application = null;
 			}
 		}
 
