@@ -1,5 +1,6 @@
 ﻿using DataModel.Entities;
 using DataModel.Geometry;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -13,16 +14,6 @@ namespace WindowController
 	/// </summary>
 	public class ProcessService : Interfaces.IProcessService
 	{
-
-		#region Private Fields
-
-		private readonly IDictionary<string, Rect> knownAdjustments = new Dictionary<string, Rect>
-		{
-			{ "chrome", new Rect{Top = 0, Bottom = 8, Left = -8, Right = 8 } },
-			{ "Rambox", new Rect{Top = 0, Bottom = 8, Left = -8, Right = 8 } }
-		};
-
-		#endregion
 
 		#region Public Methods
 
@@ -57,17 +48,22 @@ namespace WindowController
 		/// <inheritdoc/>
 		public void SetApplicationBounds(App application, Rect boundries)
 		{
-			var adjustment = new Rect();
-			if (knownAdjustments.ContainsKey(application.Name))
-			{
-				adjustment = knownAdjustments[application.Name];
-			}
-			boundries += adjustment;
+			WINDOWINFO info = new WINDOWINFO();
 
-			ShowWindow(application.Pointer, ShowWindowCommand.SW_RESTORE);
+			GetWindowInfo(application.Pointer, ref info);
+			Rect adjustments = new Rect
+			{
+				Top = 0,
+				Left = -(int)info.cxWindowBorders,
+				Right = (int)info.cxWindowBorders,
+				Bottom = (int)info.cyWindowBorders,
+			};
+
+			boundries += adjustments;
 
 			//SetForegroundWindow(application.Pointer);
 
+			ShowWindow(application.Pointer, ShowWindowCommand.SW_RESTORE);
 			MoveWindow(application.Pointer, boundries.Left, boundries.Top, boundries.Width, boundries.Height, true);
 		}
 
