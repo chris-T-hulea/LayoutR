@@ -157,20 +157,19 @@ namespace LayoutR
 			}
 		}
 
-		public DataModel.Geometry.Rect GetZone(int row, int column)
+		public Rect GetZone(int row, int column)
 		{
 			double top = Sum(this.RowSizes.Take(row))/factor;
 			double left = Sum(this.ColumnSizes.Take(column)) / factor;
 			double bot = Sum(this.RowSizes.Take(row + 1)) / factor;
 			double right = Sum(this.ColumnSizes.Take(column + 1)) / factor;
 
-			return new DataModel.Geometry.Rect
+			return new Rect
 			{
-				Bottom = (int)Math.Round(bot),
-				Right = (int)Math.Round(right),
+				Bottom = Math.Min((int)Math.Round(bot), this.RectangleVm.ActualRectangle.Height),
+				Right = Math.Min((int)Math.Round(right), this.RectangleVm.ActualRectangle.Width),
 				Top = (int)Math.Round(top),
 				Left = (int)Math.Round(left),
-
 			};
 		}
 
