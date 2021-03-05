@@ -148,12 +148,6 @@ namespace LayoutR
 				this.SelectedApplication = selectedApp;
 			}
 		}
-
-		private static object GetPropValue(object src, string propName)
-		{
-			return src.GetType().GetProperty(propName,BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)?.GetValue(src, null);
-		}
-
 		private void ReloadDisplays()
 		{
 			var allDisplays = this.displayService.GetAllDisplays().ToList();
