@@ -7,23 +7,23 @@ namespace WindowController.Interfaces
 	public interface IProcessService
 	{
 		/// <summary>
-		/// Gets all the Currently running processes
+		/// Gets all the Currently running applications.
 		/// </summary>
 		/// <returns></returns>
-		IEnumerable<Screen> GetAllProcesses();
+		IEnumerable<App> GetAllApplication();
 
 		/// <summary>
-		/// Gets the current bounderies of a specified screen.
+		/// Gets the current bounderies of a specified application.
 		/// </summary>
-		/// <param name="screen">The specified screen.</param>
-		/// <returns>The boundries of the screen.</returns>
-		Rect GetScreenBounds(Screen screen);
+		/// <param name="app">The specified application.</param>
+		/// <returns>The boundries of the application.</returns>
+		Rect GetApplicationBounds(App application);
 
 		/// <summary>
-		/// Sets the boundries of a specified screen
+		/// Sets the boundries of a specified application
 		/// </summary>
-		/// <param name="screen">The screen to be updated.</param>
+		/// <param name="application">The application to be updated.</param>
 		/// <param name="boundries">The boundries to set.</param>
-		void SetScreenBounds(Screen screen, Rect boundries);
+		void SetApplicationBounds(App application, Rect boundries);
 	}
 }

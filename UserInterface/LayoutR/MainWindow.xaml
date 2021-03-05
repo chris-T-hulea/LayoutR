@@ -14,7 +14,7 @@
 		<DataTemplate x:Key="CellTemplate" DataType="{x:Type local:ZoneVM}">
 				<Button Command="{Binding DataContext.SelectedZoneCommand, ElementName=MainGrid}"
 								CommandParameter="{Binding}"
-								Content="{Binding Screen.Name}"/>
+								Content="{Binding Application.Name}"/>
 		</DataTemplate>
 	</Window.Resources>
 	<Grid x:Name="MainGrid">
@@ -28,8 +28,8 @@
 		</Grid.RowDefinitions>
 
 		<ListView Grid.RowSpan="2"
-							ItemsSource="{Binding Screens}"
-							SelectedItem="{Binding SelectedScreen}"
+							ItemsSource="{Binding Applications}"
+							SelectedItem="{Binding SelectedApplication}"
 							SelectionMode="Single">
 			<ListView.View>
 				<GridView>
@@ -46,8 +46,8 @@
 		</ListView>
 
 		<StackPanel Grid.Column="1">
-			<mah:MetroHeader Header="Selected Screen">
-				<TextBox Text="{Binding SelectedScreen.Name}"/>
+			<mah:MetroHeader Header="Selected Application">
+				<TextBox Text="{Binding SelectedApplication.Name}"/>
 			</mah:MetroHeader>
 			<mah:MetroHeader Header="TextBox Header">
 				<TextBox  Text="{Binding SelectedDisplay.HDivisions}"/>

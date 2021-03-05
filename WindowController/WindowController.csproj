@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Unity.Container" Version="5.11.11" />
+    <PackageReference Include="Vanara.PInvoke.User32" Version="3.3.4" />
   </ItemGroup>
 
   <ItemGroup>

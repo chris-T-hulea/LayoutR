@@ -3,7 +3,9 @@ using DataModel.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using Vanara.PInvoke;
 using WindowController.Interfaces;
+using static Vanara.PInvoke.User32;
 
 namespace WindowController
 {
@@ -15,12 +17,6 @@ namespace WindowController
 
 		#region Private Fields
 		
-		/// <summary>
-		/// Task bar size 
-		/// </summary>
-		// TODO find it dynamically
-		private readonly Rect taskbarDiff = new Rect { Bottom = 40 };
-
 		private List<Display> displays;
 
 		#endregion
@@ -33,24 +29,11 @@ namespace WindowController
 		public DisplayService()
 		{
 			this.displays = new List<Display>();
+
+			
 		}
 
 		#endregion
-
-		#region External Methods
-
-		/// <summary>
-		/// Gets the rectangle representing the frame of a window.
-		/// </summary>
-		/// <param name="windowHandle">The window handle.</param>
-		/// <param name="rectangle">The rectangle.</param>
-		/// <returns></returns>
-		[DllImport("user32.dll")]
-		static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, EnumMonitorsDelegate lpfnEnum, IntPtr dwData);
-
-		#endregion
-
-		delegate bool EnumMonitorsDelegate(IntPtr hMonitor, IntPtr hdcMonitor, ref Rect lprcMonitor, IntPtr dwData);
 
 		#region Public Methods
 
@@ -59,7 +42,7 @@ namespace WindowController
 		{
 			this.displays.Clear();
 
-			EnumDisplayMonitors((IntPtr)null, (IntPtr)null, AddMonitor, (IntPtr)null);
+			EnumDisplayMonitors(HDC.NULL, null, this.AddMonitor, IntPtr.Zero) ;
 
 			return displays;
 		}
@@ -68,18 +51,22 @@ namespace WindowController
 
 		#region Private Methods
 
-		private bool AddMonitor(IntPtr hMonitor, IntPtr hdcMonitor, ref Rect lprcMonitor, IntPtr dwData)
+		private bool AddMonitor(IntPtr Arg1, IntPtr Arg2, PRECT Arg3, IntPtr Arg4)
 		{
 			Display display = new Display();
+			MONITORINFOEX monitor = new MONITORINFOEX();
+
+			monitor.cbSize = (uint)Marshal.SizeOf(typeof(MONITORINFOEX));
+			GetMonitorInfo(Arg1, ref monitor);
 
 			display.Position = new Rect
 			{
-				Left = lprcMonitor.Left,
-				Top = lprcMonitor.Top,
-				Right = lprcMonitor.Right,
-				Bottom = lprcMonitor.Bottom - taskbarDiff.Bottom,
-
+				Left = monitor.rcWork.left,
+				Top = monitor.rcWork.top,
+				Right = monitor.rcWork.right,
+				Bottom = monitor.rcWork.bottom,
 			};
+
 
 			display.IsPrimary = display.Position.Left == 0 && display.Position.Top == 0;
 

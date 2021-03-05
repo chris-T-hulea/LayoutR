@@ -14,7 +14,7 @@ namespace LayoutR
 		private readonly MainWindowViewModel mainViewModel;
 		private double height;
 		private double width;
-		private Screen screen;
+		private DataModel.Entities.App application;
 		private int row;
 		private int col;
 		private RectangleVM rectangle;
@@ -83,9 +83,9 @@ namespace LayoutR
 		public double Width { get => width; set => SetProperty(ref this.width, value); }
 
 		/// <summary>
-		/// Gets or sets the current screen bindet to the zone.
+		/// Gets or sets the current application binded to the zone.
 		/// </summary>
-		public Screen Screen { get => this.screen; set => this.SetProperty(ref this.screen, value); }
+		public DataModel.Entities.App Application { get => this.application; set => this.SetProperty(ref this.application, value); }
 
 		/// <summary>
 		/// gets or sets the display the zone belongs to.
