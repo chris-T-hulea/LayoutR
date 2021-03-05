@@ -66,12 +66,21 @@ namespace UIUtils
 
 			public SuppressionDisposer(BulkObservableCollection<T> source)
 			{
+				if (source.suppressed)
+				{
+					return;
+				}
 				this.source = source;
 				this.source.suppressed = true;
 			}
 
 			public void Dispose()
 			{
+				if(this.source == null)
+				{
+					return;
+				}
+
 				this.source.suppressed = false;
 				this.source.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
 			}

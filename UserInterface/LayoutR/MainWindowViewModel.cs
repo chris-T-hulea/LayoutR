@@ -39,6 +39,7 @@ namespace LayoutR
 			this.SelectedZoneCommand = new DelegateCommand<ZoneVM>(this.OnZoneSelected);
 
 			OnTimerElapsed(null, null);
+			SetupTimer();
 		}
 
 		#endregion
@@ -117,19 +118,34 @@ namespace LayoutR
 
 		private void SetupTimer()
 		{
-			this.timer.Interval = TimeSpan.FromSeconds(1); // milliseconds
+			this.timer.Interval = TimeSpan.FromMilliseconds(500); 
 			this.timer.Tick += OnTimerElapsed;
 			this.timer.Tick += this.OnTimerElapsed;
-			//this.timer.Start();
+			this.timer.Start();
 		}
 
 		private void OnTimerElapsed(object sender, EventArgs e)
 		{
+			IEnumerable<DataModel.Entities.App> source = this.windowController.GetAllApplication().OrderBy(app => app.Name);
+			var common = this.Applications.Where(app => source.Any(inApp => inApp.Pointer == app.Pointer)).ToList();
+			var selectedApp = this.SelectedApplication;
+
+			if(common.Count() == source.Count())
+			{
+				return;
+			}
+
 			using (this.Applications.SuppressiNotifications())
 			{
-				IEnumerable<DataModel.Entities.App> source = this.windowController.GetAllApplication().OrderBy(app => app.Name);
 				this.Applications.Clear();
-				this.Applications.AddRange(source);
+				this.Applications.AddRange(common);
+				this.Applications.AddRange(source.Where(app=>common.All(inApp => inApp.Id != app.Id)));
+			}
+
+			selectedApp = this.Applications.FirstOrDefault(app => app?.Id == selectedApp?.Id);
+			if (selectedApp != null)
+			{
+				this.SelectedApplication = selectedApp;
 			}
 		}
 

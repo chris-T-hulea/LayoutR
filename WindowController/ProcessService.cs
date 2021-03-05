@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Timers;
 using Vanara.PInvoke;
 using static Vanara.PInvoke.User32;
 
@@ -14,6 +15,48 @@ namespace WindowController
 	/// </summary>
 	public class ProcessService : Interfaces.IProcessService
 	{
+		#region Private Fields
+
+		private List<App> appCache;
+
+		private Timer timer;
+
+		private object cacheLock;
+
+		#endregion
+
+		#region Constructors
+
+		public ProcessService()
+		{
+			this.appCache = new List<App>();
+			this.cacheLock = new object();
+			this.timer = new Timer();
+			this.timer.Interval = 500;
+			this.timer.Elapsed += this.OntimerElapsed;
+			this.timer.AutoReset = true;
+			this.timer.Start();
+			this.OntimerElapsed(null, null);
+		}
+
+		private void OntimerElapsed(object sender, ElapsedEventArgs e)
+		{
+			IEnumerable<Process> processes = Process.GetProcesses();
+			var apps = processes.Select(process => new App
+			{
+				Id = process.Id,
+				Name = process.ProcessName,
+				Title = process.MainWindowTitle,
+				Pointer = process.MainWindowHandle,
+			});
+
+			lock (this.cacheLock)
+			{
+				this.appCache = apps.ToList();
+			}
+		}
+
+		#endregion
 
 		#region Public Methods
 
@@ -21,14 +64,10 @@ namespace WindowController
 		/// <inheritdoc/>
 		public IEnumerable<App> GetAllApplication()
 		{
-			IEnumerable<Process> processes = Process.GetProcesses();
-			return processes.Select(process => new App
+			lock (this.cacheLock)
 			{
-				Id = process.Id,
-				Name = process.ProcessName,
-				Title = process.MainWindowTitle,
-				Pointer = process.MainWindowHandle,
-			});
+				return this.appCache;
+			}
 		}
 
 		/// <inheritdoc/>
